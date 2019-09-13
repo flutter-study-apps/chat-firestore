@@ -34,51 +34,54 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
     controller.addListener((){
       setState(() { 
       });
-      print(controller.value);
+      // print(controller.value);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false, 
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Hero(
-                  tag: 'logo' ,
-                  child: Container(
-                    child: Image.asset('images/logo.png'),
-                    height: controller.value,
+        child: SafeArea(
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Hero(
+                    tag: 'logo' ,
+                    child: Container(
+                      child: Image.asset('images/logo.png'),
+                      height: controller.value,
+                    ),
                   ),
-                ),
-                Text(
-                  'Flash chat',
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
+                  Text(
+                    'Flash chat',
+                    style: TextStyle(
+                      fontSize: 45.0,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 48.0,
-            ),
+                ],
+              ),
+              SizedBox(
+                height: 48.0,
+              ),
 
-            RoundedButton(title: 'Log In', colour: Colors.lightBlueAccent, onPressed: (){
-              Navigator.pushNamed(context, LoginScreen.id);
-            },),
+              RoundedButton(title: 'Log In', colour: Colors.lightBlueAccent, onPressed: (){
+                Navigator.pushNamed(context, LoginScreen.id);
+              },),
 
-            RoundedButton(title: 'Register', colour: Colors.blueAccent,onPressed: (){
-              Navigator.pushNamed(context, RegistrationScreen.id);
-            },),
+              RoundedButton(title: 'Register', colour: Colors.blueAccent,onPressed: (){
+                Navigator.pushNamed(context, RegistrationScreen.id);
+              },),
 
-          ],
+            ],
+          ),
         ),
       ),
     );
