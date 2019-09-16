@@ -25,7 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final user = await _auth.currentUser();
       if (user != null){
         LoggedInUser = user;
-        print(LoggedInUser);
+        // print(LoggedInUser);
       }
     } catch (e) {
     }
@@ -40,10 +40,12 @@ class _ChatScreenState extends State<ChatScreen> {
         leading: null,
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                //Implement logout functionality
-              }),
+            icon: Icon(Icons.close),
+            onPressed: () {
+              //Implement logout functionality
+              _auth.signOut();
+              Navigator.pop(context);
+            }),
         ],
         title: Text('⚡️Chat'),
         backgroundColor: Colors.lightBlueAccent,
