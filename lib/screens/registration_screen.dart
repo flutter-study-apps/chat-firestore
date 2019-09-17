@@ -79,7 +79,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   colour: Colors.blueAccent, 
                   onPressed: () async{
                     setState(() {
-                     showSpinner = true; 
+                      showSpinner = true; 
                     });
 
                     try{
@@ -92,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         
                       }
                       setState(() {
-                       showSpinner = false; 
+                        showSpinner = false; 
                       });
                     }
                     catch(e){
