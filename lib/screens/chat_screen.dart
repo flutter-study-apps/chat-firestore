@@ -4,21 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final _firestore = Firestore.instance;
+FirebaseUser LoggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
-  @override
+  @override 
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance; 
   final messageTextController=TextEditingController();
-  FirebaseUser LoggedInUser;
   String messageText;
   
-
-
   @override
   void initState() {
        super.initState();
@@ -70,7 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
               // messagesStream();
             }),
         ],
-        title: Text('⚡️Chat'),
+        title: Text('Random Chat'),
         backgroundColor: Colors.lightBlueAccent,
       ),
       body: SafeArea(
@@ -101,6 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       _firestore.collection('messages').add({
                         'text': messageText,
                         'sender':LoggedInUser.email,
+                        'timestamp': DateTime.now(),
                       });
                     },
                     child: Text(
@@ -123,7 +122,8 @@ class MessagesStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('messages').snapshots(),
+      // stream: _firestore.collection('messages').snapshots(),
+      stream: _firestore.collection('messages').orderBy('timestamp', descending:false).snapshots(),
       builder: (context, snapshot){
 
         if (!snapshot.hasData){
@@ -133,7 +133,7 @@ class MessagesStream extends StatelessWidget {
             ),
           );
         }
-          final messages = snapshot.data.documents;
+          final messages = snapshot.data.documents.reversed;
 
           //Notice that we used MessageBubble as the type of List from being a text. because messagesBubbles must be the same 
           //with it which is another statelesswidget we created below and we don't use text for List anymore
@@ -141,12 +141,20 @@ class MessagesStream extends StatelessWidget {
           for (var message in messages){
             final messageText = message.data['text'];
             final messageSender = message.data['sender'];
-            final messageBubble = MessageBubble(messageSender,messageText) ;
+
+            final currentUser = LoggedInUser.email;
+
+            final messageBubble = MessageBubble(
+              sender:messageSender,
+              text:messageText,
+              isMe: currentUser == messageSender,
+              ) ;
             messageBubbles.add(messageBubble);
           }  
 
           return Expanded(
             child: ListView(
+              reverse: true,
               padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
               children: messageBubbles,
             ),
@@ -160,10 +168,11 @@ class MessagesStream extends StatelessWidget {
 
 class MessageBubble extends StatelessWidget {
 
-  MessageBubble(this.sender,this.text);
+  MessageBubble({this.sender,this.text,this.isMe});
  
   final String sender;
   final String text;
+  final bool isMe;
 
   @override
   Widget build(BuildContext context) {
@@ -171,24 +180,26 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: isMe?  CrossAxisAlignment.end : CrossAxisAlignment.start ,
         children: <Widget>[
-          Text(
-            sender,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.black54
-            ),
-          ),
+          
           Material(
-              color: Colors.lightBlueAccent,
-              borderRadius: BorderRadius.circular(30),
+              // color: Colors.lightBlueAccent,
+              color: isMe ? Colors.grey : Colors.red,
+              // borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+                topLeft: isMe? Radius.circular(30): Radius.circular(0),
+                topRight: isMe? Radius.circular(0):Radius.circular(30)
+
+              ),
               // use elevation to add shadow to widget
               elevation: 5 ,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
                 child: Text(
-                '$Text from $sender',
+                '$text',
                 style: TextStyle(
                   fontSize: 15, 
                   color: Colors.white
@@ -196,6 +207,15 @@ class MessageBubble extends StatelessWidget {
 
             ),
               ),
+          ),
+          isMe?
+          Text(''):
+          Text(
+            sender,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.black54
+            ),
           ),
         ],
       ),
